@@ -3,6 +3,10 @@ package src.entity;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import src.main.GamePanel;
 import src.main.KeyHandler;
 
@@ -13,6 +17,16 @@ public class Player extends Entity {
 
     public final int screenX;
     public final int screenY;
+
+    // Player images
+    public BufferedImage up0, up1, up2;
+    public BufferedImage down0, down1, down2;
+    public BufferedImage left0, left1, left2;
+    public BufferedImage right0, right1, right2;
+
+    // Animation counters
+    public int spriteCounter = 0;
+    public int spriteNum = 0;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -35,10 +49,42 @@ public class Player extends Entity {
     // example up from boy_up_0.png
     // using ImageIO.read()
     public final void getPlayerImage() {
-        // TO DO
-        // try {
-        // } catch (IOException e) {
-        // }
+        try {
+            String[] paths = {
+                "/res/player/p0/boy_up_0.png",
+                "/res/player/p0/boy_up_1.png",
+                "/res/player/p0/boy_up_2.png",
+                "/res/player/p0/boy_down_0.png",
+                "/res/player/p0/boy_down_1.png",
+                "/res/player/p0/boy_down_2.png",
+                "/res/player/p0/boy_left_1.png",
+                "/res/player/p0/boy_left_2.png",
+                "/res/player/p0/boy_right_1.png",
+                "/res/player/p0/boy_right_2.png"
+            };
+            for (String path : paths) {
+                if (getClass().getResourceAsStream(path) == null) {
+                    System.out.println("Resource not found: " + path);
+                }
+            }
+            up0    = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_up_0.png"));
+            up1    = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_up_1.png"));
+            up2    = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_up_2.png"));
+
+            down0  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_down_0.png"));
+            down1  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_down_1.png"));
+            down2  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_down_2.png"));
+
+            left0  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_left_1.png")); // fallback to left_1
+            left1  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_left_1.png"));
+            left2  = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_left_2.png"));
+
+            right0 = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_right_1.png")); // fallback to right_1
+            right1 = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_right_1.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/res/player/p0/boy_right_2.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // the default value of the speed, the location and the direction the player is
@@ -54,8 +100,46 @@ public class Player extends Entity {
     // if he can add or substract the speed from his coordonates and select what
     // image to use to maka an animation
     public void update() {
-        //TO DO
+        boolean moving = false;
+
+        if (keyH.upPressed) {
+            direction = "up";
+            moving = true;
+        } else if (keyH.downPressed) {
+            direction = "down";
+            moving = true;
+        } else if (keyH.leftPressed) {
+            direction = "left";
+            moving = true;
+        } else if (keyH.rightPressed) {
+            direction = "right";
+            moving = true;
+        }
+
+        // Check collisions here if you want, e.g.,
+        // cChecker.checkTile(this);
+
+        // Move player if no collision
+        if (moving) {
+            switch (direction) {
+                case "up" -> worldY -= speed;
+                case "down" -> worldY += speed;
+                case "left" -> worldX -= speed;
+                case "right" -> worldX += speed;
+            }
+
+            // Update sprite for simple animation
+            spriteCounter++;
+            if (spriteCounter > 12) { // change every 12 frames
+                spriteNum = (spriteNum + 1) % 3; // cycles 0,1,2
+                spriteCounter = 0;
+            }
+        } else {
+            spriteNum = 0; // idle sprite
+        }
     }
+
+
 
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
