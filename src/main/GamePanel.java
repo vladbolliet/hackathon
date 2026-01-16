@@ -9,6 +9,12 @@ import src.entity.Player;
 import src.tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
+        // Monster instance
+        public src.entity.Monster monster = new src.entity.Monster(this);
+    // UI inventory bar image
+    private java.awt.image.BufferedImage uiBarImage;
+    // Sword icon for inventory
+    private java.awt.image.BufferedImage swordIcon;
     // SCREEN SETTINGS
     final int originalTitleSize = 16; // 16 * 16, tile or size of the sprite
     final int scale = 3; // scale for the tile to make it bigger or smaller
@@ -29,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
     // FPS
     int FPS = 60;
 
-    TileManager tileM = new TileManager(this);
+    public TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
     Thread gamThread;
     public CollisionChecker cChecker = new CollisionChecker(this);
@@ -41,6 +47,12 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true); // the gamepanel can be focused on to read key input
+        // Load sword icon (replace with your actual image path)
+        try {
+            swordIcon = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/items/swords.png")).getSubimage(0, 0, 16, 16);
+        } catch (Exception e) {
+            System.out.println("Could not load sword icon: /res/items/swords.png");
+        }
     }
 
     public void startGameThread() {
@@ -84,6 +96,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         player.update();
+        monster.update();
     }
 
     @Override
@@ -94,6 +107,21 @@ public class GamePanel extends JPanel implements Runnable {
 
         tileM.draw(g2);
         player.draw(g2);
+
+        // Draw monster after map, before UI
+        monster.draw(g2);
+
+
+        // Draw only the sword icon at the bottom center if player has sword, scaled up
+        int gap = 16; // pixels of gap from the bottom
+        if (player.hasSword && swordIcon != null) {
+            int scale = 3; // scale factor for inventory icon
+            int iconW = swordIcon.getWidth() * scale;
+            int iconH = swordIcon.getHeight() * scale;
+            int iconX = (screenWidth - iconW) / 2;
+            int iconY = screenHeight - iconH - gap;
+            g2.drawImage(swordIcon, iconX, iconY, iconW, iconH, null);
+        }
 
         g2.dispose();
     }

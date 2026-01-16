@@ -12,6 +12,13 @@ import src.main.KeyHandler;
 
 public class Player extends Entity {
 
+    public boolean hasSword = false;
+    public int attackPoints = 0;
+    // Map sword positions to replacement tile numbers (col, row) -> tileNum
+    // Example: {(10, 12): 0, (15, 20): 5} means sword at (10,12) becomes grass (0), at (15,20) becomes sand (5)
+    // Fill this map as needed for your swords
+    public java.util.Map<String, Integer> swordReplacementTiles = new java.util.HashMap<>();
+
     GamePanel gp;
     KeyHandler keyH;
 
@@ -43,6 +50,11 @@ public class Player extends Entity {
 
         setDefaultValues();
         getPlayerImage();
+
+        // Example: set up sword replacement mapping (col, row) -> tileNum
+        // You must fill this with the actual positions and replacement tile numbers you want
+        // swordReplacementTiles.put("col,row", tileNum);
+        // Example: swordReplacementTiles.put("10,12", 0); // sword at (10,12) becomes grass (0)
     }
 
     // get the images of the player and put it in a variable
@@ -118,6 +130,20 @@ public class Player extends Entity {
 
         collisionOn = false;
         gp.cChecker.checkTile(this);
+
+        // Sword pickup logic (after collision check, before movement)
+        int playerCol = (worldX + solidArea.x + solidArea.width / 2) / gp.tileSize;
+        int playerRow = (worldY + solidArea.y + solidArea.height / 2) / gp.tileSize;
+        int tileNum = gp.tileM.mapTileNum[playerCol][playerRow];
+        if (!hasSword && tileNum == 6) { // 6 = sword tile
+            hasSword = true;
+            attackPoints = 1;
+            // Find replacement tile for this sword position
+            String key = playerCol + "," + playerRow;
+            int replacement = swordReplacementTiles.getOrDefault(key, 0); // default to grass (0)
+            gp.tileM.mapTileNum[playerCol][playerRow] = replacement;
+            // Optionally: print or trigger sound/message here
+        }
 
         // Move player if no collision
         if (moving && !collisionOn) {
