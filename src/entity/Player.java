@@ -116,11 +116,11 @@ public class Player extends Entity {
             moving = true;
         }
 
-        // Check collisions here if you want, e.g.,
-        // cChecker.checkTile(this);
+        collisionOn = false;
+        gp.cChecker.checkTile(this);
 
         // Move player if no collision
-        if (moving) {
+        if (moving && !collisionOn) {
             switch (direction) {
                 case "up" -> worldY -= speed;
                 case "down" -> worldY += speed;
