@@ -1,0 +1,43 @@
+How to extract sword from png with multiple sword: 
+
+Use Java's BufferedImage.getSubimage(x, y, w, h) to extract each sword from the spritesheet at runtime. Example:
+
+BufferedImage sheet = ImageIO.read(getClass().getResourceAsStream("/res/items/swords.png"));
+BufferedImage sword1 = sheet.getSubimage(0, 0, 16, 16); // first sword (top-left)
+BufferedImage sword2 = sheet.getSubimage(16, 0, 16, 16); // second sword (next column)
+// ...and so on
+
+No need to split the file manually—just use getSubimage in your code to extract each sword when you need it!
+
+
+============
+
+Here’s a step-by-step plan for adding a sword as a tile you can pick up:
+
+1. Make the Sword Appear on the Map
+Place your sword image (e.g., sword.png) in res/tiles/.
+In TileManager.java:
+Add a new tile slot for the sword (e.g., tile[6]).
+Load the sword image in getTileImage().
+Set collision = false for the sword tile.
+In your map file (res/maps/world01.txt):
+Pick a number (e.g., 6) to represent the sword tile.
+Replace a tile number in the map with 6 where you want the sword to appear.
+2. Collision with Player and Sword
+In CollisionChecker.java:
+Add logic in checkTile to detect when the player is on a sword tile (tileNum == 6).
+You don’t need to block movement, just detect the overlap.
+3. Picking Up the Sword
+In Player.java or GamePanel.java:
+When the player collides with a sword tile, set a flag (e.g., hasSword = true).
+Remove the sword from the map (set mapTileNum[x][y] = 0 or another background tile).
+Optionally, play a sound or show a message.
+What to Edit:
+res/tiles/sword.png (add your image)
+TileManager.java (add sword tile)
+world01.txt (place sword on map)
+CollisionChecker.java (detect sword pickup)
+Player.java (track hasSword, remove sword from map)
+
+======================
+

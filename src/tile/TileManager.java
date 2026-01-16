@@ -56,6 +56,11 @@ public class TileManager {
             tile[5] = new Tile();
             tile[5].image = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/tiles/sand.png"));
             tile[5].collision = false;
+
+            tile[6] = new Tile();
+            tile[6].image = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/items/swords.png")).getSubimage(0, 0, 16, 16);
+            tile[6].collision = false;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
